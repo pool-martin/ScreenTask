@@ -45,7 +45,7 @@ namespace ScreenTask
                 comboScreens.Items.Add(screen.DeviceName.Replace("\\", "").Replace(".", ""));
             }
             comboScreens.SelectedIndex = 0;
-            this.Text = $"Screen Task v{currentVersion.Major}.{currentVersion.Minor}";
+            this.Text = "Screen Task v{currentVersion.Major}.{currentVersion.Minor}";
         }
 
         private async void btnStartServer_Click(object sender, EventArgs e)
@@ -62,7 +62,7 @@ namespace ScreenTask
                     serv.Close();
                 }
                 Log("Server Stoped.");
-                appNotify.ShowBalloonTip(1_000, "ScreenTask", "Server Stoped.", ToolTipIcon.Info);
+                appNotify.ShowBalloonTip(1000, "ScreenTask", "Server Stoped.", ToolTipIcon.Info);
 
                 return;
             }
@@ -75,7 +75,7 @@ namespace ScreenTask
                 isWorking = true;
                 Log("Starting Server, Please Wait...");
                 await AddFirewallRule((int)numPort.Value);
-                _ = Task.Factory.StartNew(() => CaptureScreenEvery((int)numShotEvery.Value), TaskCreationOptions.LongRunning);
+                Task.Factory.StartNew(() => CaptureScreenEvery((int)numShotEvery.Value), TaskCreationOptions.LongRunning);
                 btnStartServer.Tag = "stop";
                 btnStartServer.Text = "Stop Server";
                 await StartServer();
@@ -93,12 +93,12 @@ namespace ScreenTask
                     btnStartServer.Tag = "start";
                     btnStartServer.Text = "Start Server";
                     isWorking = false;
-                    Log($"This port {numPort.Value} is already used");
-                    var msgResult = MessageBox.Show($"This port {numPort.Value} is already used, Do you want to use another random one ?", "Port Already Used !", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    Log("This port {numPort.Value} is already used");
+                    var msgResult = MessageBox.Show("This port {numPort.Value} is already used, Do you want to use another random one ?", "Port Already Used !", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (msgResult == DialogResult.Yes)
                     {
                         numPort.Value += DateTime.Now.Second;
-                        Log($"New port is {numPort.Value}");
+                        Log("New port is {numPort.Value}");
                         btnStartServer_Click(sender, e);
                     }
                     else
@@ -132,7 +132,7 @@ namespace ScreenTask
             serv.Prefixes.Add(url + "/");
             serv.Start();
             Log("Server Started Successfuly!");
-            appNotify.ShowBalloonTip(1_000, "ScreenTask", $"Server Started Successfuly!\r\n{url}", ToolTipIcon.Info);
+            appNotify.ShowBalloonTip(1000, "ScreenTask", "Server Started Successfuly!\r\n" + url, ToolTipIcon.Info);
 
             Log("Network URL : " + url);
             Log("Localhost URL : " + "http://localhost:" + numPort.Value.ToString() + "/");
@@ -263,18 +263,24 @@ namespace ScreenTask
                 bmp = null;
                 return;
             }
-            Rectangle bounds = Screen.GetBounds(Point.Empty);
-            using (Bitmap bitmap = new Bitmap(bounds.Width, bounds.Height))
+
+            int screenLeft   = (SystemInformation.VirtualScreen.Width / Screen.AllScreens.Length) * comboScreens.SelectedIndex;
+            int screenTop    = SystemInformation.VirtualScreen.Top;
+            int screenWidth  = SystemInformation.VirtualScreen.Width / Screen.AllScreens.Length;
+            int screenHeight = SystemInformation.VirtualScreen.Height;
+
+            // Create a bitmap of the appropriate size to receive the screenshot.
+            using (Bitmap bitmap = new Bitmap(screenWidth, screenHeight))
             {
+                // Draw the screenshot into our bitmap.
                 using (Graphics g = Graphics.FromImage(bitmap))
                 {
-                    g.CopyFromScreen(Point.Empty, Point.Empty, bounds.Size);
+                    g.CopyFromScreen(screenLeft, screenTop, 0, 0, bitmap.Size);
                 }
+
                 rwl.AcquireWriterLock(Timeout.Infinite);
                 bitmap.Save(Application.StartupPath + "/WebServer" + "/ScreenTask.jpg", ImageFormat.Jpeg);
                 rwl.ReleaseWriterLock();
-
-
             }
         }
         private string GetIPv4Address()
@@ -431,7 +437,7 @@ namespace ScreenTask
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to load local appsettings.xml file.\r\n{ex.Message}", "ScreenTask", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Failed to load local appsettings.xml file.\r\n{ex.Message}", "ScreenTask", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             if (_currentSettings.IsStartMinimizedEnabled)
@@ -458,7 +464,7 @@ namespace ScreenTask
 
                     if (newVersion > currentVersion)
                     {
-                        var msgResult = MessageBox.Show($"There is a new update available for download.\nCurrent Version: {currentVersion}\nLatest Version: {newVersion}\nDo you want to download it now ?", "New Version Released!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                        var msgResult = MessageBox.Show("There is a new update available for download.\nCurrent Version: {currentVersion}\nLatest Version: {newVersion}\nDo you want to download it now ?", "New Version Released!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
                         if (msgResult == DialogResult.Yes)
                         {
                             Process.Start("https://screentask.me");
@@ -469,7 +475,7 @@ namespace ScreenTask
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to check for updates.\r\n{ex.Message}", "ScreenTask", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Failed to check for updates.\r\n" + ex.Message, "ScreenTask", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             }
         }
@@ -503,7 +509,7 @@ namespace ScreenTask
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Cannot save the settings file next to the executable file.\r\n{ex.Message}", "ScreenTask", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Cannot save the settings file next to the executable file.\r\n{ex.Message}", "ScreenTask", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -527,7 +533,7 @@ namespace ScreenTask
             {
                 this.ShowInTaskbar = false;
                 appNotify.Visible = true;
-                appNotify.ShowBalloonTip(1_000, "ScreenTask", "Running in the background", ToolTipIcon.Info);
+                appNotify.ShowBalloonTip(1000, "ScreenTask", "Running in the background", ToolTipIcon.Info);
             }
         }
 
