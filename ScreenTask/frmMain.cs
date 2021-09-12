@@ -45,7 +45,7 @@ namespace ScreenTask
                 comboScreens.Items.Add(screen.DeviceName.Replace("\\", "").Replace(".", ""));
             }
             comboScreens.SelectedIndex = 0;
-            this.Text = "Screen Task v{currentVersion.Major}.{currentVersion.Minor}";
+            this.Text = "Screen Task v" + currentVersion.Major + "." + currentVersion.Minor + ".JPBuild";
         }
 
         private async void btnStartServer_Click(object sender, EventArgs e)
@@ -75,7 +75,7 @@ namespace ScreenTask
                 isWorking = true;
                 Log("Starting Server, Please Wait...");
                 await AddFirewallRule((int)numPort.Value);
-                Task.Factory.StartNew(() => CaptureScreenEvery((int)numShotEvery.Value), TaskCreationOptions.LongRunning);
+                await Task.Factory.StartNew(() => CaptureScreenEvery((int)numShotEvery.Value), TaskCreationOptions.LongRunning);
                 btnStartServer.Tag = "stop";
                 btnStartServer.Text = "Stop Server";
                 await StartServer();
@@ -85,6 +85,7 @@ namespace ScreenTask
             {
                 serv = new HttpListener();
                 serv.IgnoreWriteExceptions = true;
+                Log(disObj.Message);
             }
             catch (HttpListenerException httpEx)
             {
@@ -135,6 +136,7 @@ namespace ScreenTask
             appNotify.ShowBalloonTip(1000, "ScreenTask", "Server Started Successfuly!\r\n" + url, ToolTipIcon.Info);
 
             Log("Network URL : " + url);
+            Log("Network URL for Full Screen: " + url + "/?full_screen=True");
             Log("Localhost URL : " + "http://localhost:" + numPort.Value.ToString() + "/");
             while (isWorking)
             {
@@ -158,7 +160,7 @@ namespace ScreenTask
                     }
                     catch (Exception ex)
                     {
-
+                        Log(ex.Message);
 
                     }
                     ctx.Response.Close();
@@ -195,7 +197,7 @@ namespace ScreenTask
                             }
                             catch (Exception ex)
                             {
-
+                                Log(ex.Message);
 
                             }
                             ctx.Response.Close();
@@ -228,7 +230,7 @@ namespace ScreenTask
                 }
                 catch (Exception ex)
                 {
-
+                    Log(ex.Message);
                     /*
                         Do Nothing !!! this is the Only Effective Solution for this Exception : 
                         the specified network name is no longer available
@@ -437,7 +439,7 @@ namespace ScreenTask
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to load local appsettings.xml file.\r\n{ex.Message}", "ScreenTask", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Failed to load local appsettings.xml file.\r\n" + ex.Message, "ScreenTask", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             if (_currentSettings.IsStartMinimizedEnabled)
@@ -509,7 +511,7 @@ namespace ScreenTask
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Cannot save the settings file next to the executable file.\r\n{ex.Message}", "ScreenTask", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Cannot save the settings file next to the executable file.\r\n" + ex.Message, "ScreenTask", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

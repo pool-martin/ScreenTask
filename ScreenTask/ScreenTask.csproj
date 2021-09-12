@@ -120,7 +120,7 @@
     <Content Include="WebServer\index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="WebServer\full_screen.html">
+    <Content Include="WebServer\file_icon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

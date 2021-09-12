@@ -9,6 +9,7 @@
     <title>Screen Task</title>
 
     <link href="bootstrap.min.css" rel="stylesheet" />
+    <link rel="icon" href="file_icon.ico">
     <style>
         body {
             padding-top: 5px;
@@ -112,9 +113,9 @@
 <body>
 
 
-    <div class="container">
+    <div id='mainContainer' class="container">
 
-        <div class="masthead">
+        <div id="Title" class="masthead">
             <h1 class="text-muted">Screen Task</h1>
             <ul class="nav nav-justified">
                 <li class="active"><a href="./">Home</a></li>
@@ -122,7 +123,7 @@
                 <li><a id="lnkAbout" href="#">About</a></li>
             </ul>
         </div>
-        <br />
+        <div id='Separator1'><hr /></div>
         <div id="msgAbout" class="alert alert-info alert-dismissable hidden">
             <button id="closeAbout" type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             <strong>About!</strong>
@@ -131,13 +132,12 @@
             <p class="text-center"><em>Hope This Helps You On Your Work!</em></p>
             <p> Send Your Feedback to : EslaMx7@Gmail.Com</p>
         </div>
-
-        <hr />
+        <div id='Separator2'><hr /></div>
         <!-- Preview -->
         <div id="Viewer" class="imgPreview">
             <img id="imgPrev" src="ScreenTask.jpg" class="img-responsive" alt="LIVE! Sever Screen Now!" />
-            <br />
-            <div class="well text-center">
+            <div id='Separator3'><hr /></div>
+            <div id='Controls' class="well text-center">
 
                 <div class="row">
                     
@@ -165,7 +165,7 @@
 
         </div>
         <!-- Site footer -->
-        <div class="footer">
+        <div id="Footer" class="footer">
             <p>&copy; Screen Task 2014 | <a href="http://eslamx.com">EslaMxSoft</a>, by <a href="https://twitter.com/EslaMx7">@EslaMx7</a>.</p>
         </div>
 
@@ -244,6 +244,28 @@
             requestFullScreen(viewer);
         };
 
+        var divState = {}; // we store the status in this object
+        function hideOtherDivs(id) {
+            if (document.getElementById) {
+                //close others divs
+                const hiding_ids = ['Title', 'Separator1', 'Separator2', 'Separator3', 'msgAbout', 'Controls', 'Footer']
+                for (const div of hiding_ids){
+                    console.log('Hiding: ' + div)
+                    document.getElementById(div).style.display = 'none'; // hide
+                }
+
+                // unset style for mainContainer to enable full screen of Viewer div
+                const divContainer = document.getElementById('mainContainer');
+                divContainer.style.all = "unset"
+            }
+        }
+
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const start_full_screen = urlSearchParams.get('full_screen');
+
+        if(start_full_screen) {
+            hideOtherDivs('Viewer');
+        }
 
 
     </script>
